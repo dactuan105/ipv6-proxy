@@ -12,17 +12,20 @@ gen64() {
   echo "$1:$(ip64):$(ip64):$(ip64):$(ip64)"
 }
 install_3proxy() {
-  echo "installing 3proxy"
-  URL="https://github.com/dactuan105/ipv6-proxy/main/3proxy-0.9.4.tar.gz"
-  wget -qO- $URL | bsdtar -xvf-
-  cd 3proxy-0.9.4
-  make -f Makefile.Linux
-  mkdir -p /usr/local/etc/3proxy/{bin,logs,stat}
-  cp src/3proxy /usr/local/etc/3proxy/bin/
-  cp ./scripts/rc.d/proxy.sh /etc/init.d/3proxy
-  chmod +x /etc/init.d/3proxy
-  chkconfig 3proxy on
-  cd $WORKDIR
+    echo "installing 3proxy"
+    URL="https://raw.githubusercontent.com/dactuan105/ipv6-proxy/main/3proxy-0.9.4.tar.gz"
+    wget -qO- $URL | bsdtar -xvf-
+    cd 3proxy-0.9.4
+    make -f Makefile.Linux
+    mkdir -p /usr/local/etc/3proxy/bin
+    mkdir -p /usr/local/etc/3proxy/logs
+    mkdir -p /usr/local/etc/3proxy/stat
+    cp src/3proxy /usr/local/etc/3proxy/bin/
+    cp ./scripts/rc.d/proxy.sh /etc/init.d/3proxy
+    chmod +x /etc/init.d/3proxy
+    chkconfig 3proxy on
+    cd $WORKDIR
+}
 }
 
 gen_3proxy() {
@@ -50,18 +53,6 @@ gen_proxy_file_for_user() {
 $(awk -F "/" '{print $3 ":" $4 ":" $1 ":" $2 }' ${WORKDATA})
 EOF
 }
-
-upload_proxy() {
-  local PASS=$(random)
-  zip --password $PASS proxy.zip proxy.txt
-  URL=$(curl -s --upload-file proxy.zip https://transfer.sh/proxy.zip)
-
-  echo "Proxy is ready! Format IP:PORT:LOGIN:PASS"
-  echo "Download zip archive from: ${URL}"
-  echo "Password: ${PASS}"
-
-}
-
 install_jq() {
   wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
   chmod +x ./jq
